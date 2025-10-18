@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import twilio from "twilio";
-import User from "../models/User";
-import Otp from "../models/Otp";
+import User from "../models/User.js";
+import Otp from "../models/Otp.js";
 import dotenv from "dotenv";
 dotenv.config(); 
 
