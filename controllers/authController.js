@@ -151,3 +151,23 @@ export const updateRole = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const getProfile = async (req, res) => {
+  const { mobile } = req.params;
+  const user = await User.findOne({ mobile });
+  if (!user) return res.status(404).json({ message: 'User not found' });
+  res.json(user);
+};
+
+export const updateProfile = async (req, res) => {
+  const { mobile } = req.params;
+  const { name, email, address, avatar } = req.body;
+
+  const user = await User.findOneAndUpdate(
+    { mobile },
+    { name, email, avatar, $push: { addresses: address } },
+    { new: true }
+  );
+
+  res.json(user);
+};
