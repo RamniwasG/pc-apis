@@ -14,11 +14,16 @@ const addressSchema = new mongoose.Schema({
   
 
 const userSchema = new mongoose.Schema({
-  mobile: {
+  phone: {
     type: String,
     required: true,
     unique: true,
     trim: true
+  },
+  country_code: {
+    type: String,
+    trim: true,
+    default: "+91"
   },
   email: {
     type: String,

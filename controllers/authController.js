@@ -64,7 +64,7 @@ export  const sendOtp = async (req, res) => {
       await twilioClient.messages.create({
         body: `Your PC login OTP is ${otp}. It expires in ${ttlMinutes} minutes.`,
         from: TWILIO_PHONE,
-        to: phone
+        to:  `+91${phone}`
       });
     } else {
       if (ENV !== "production") {
@@ -87,7 +87,7 @@ export  const sendOtp = async (req, res) => {
 // NOTE: Do not accept role from client here in production.
 export const verifyOtp = async (req, res) => {
   try {
-    const { phone, otp, name } = req.body;
+    const { phone, otp } = req.body;
     if (!phone || !otp) return res.status(400).json({ message: "Phone and OTP required" });
 
     const record = await Otp.findOne({ phone });
@@ -119,7 +119,7 @@ export const verifyOtp = async (req, res) => {
     // Find or create user (default role: user)
     let user = await User.findOne({ phone });
     if (!user) {
-      user = await User.create({ phone, name: name || "" });
+      user = await User.create({ phone });
     }
 
     const token = signToken(user);
@@ -153,18 +153,19 @@ export const updateRole = async (req, res) => {
 };
 
 export const getProfile = async (req, res) => {
-  const { mobile } = req.params;
-  const user = await User.findOne({ mobile });
+  const { id } = req.params;
+  console.log(id)
+  const user = await User.findById(id);
   if (!user) return res.status(404).json({ message: 'User not found' });
   res.json(user);
 };
 
 export const updateProfile = async (req, res) => {
-  const { mobile } = req.params;
+  const { id } = req.params;
   const { name, email, address, avatar } = req.body;
 
   const user = await User.findOneAndUpdate(
-    { mobile },
+    { id },
     { name, email, avatar, $push: { addresses: address } },
     { new: true }
   );
