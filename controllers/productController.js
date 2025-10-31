@@ -2,14 +2,14 @@ import Product from "../models/Product.js";
 
 export const createProduct = async (req, res) => {
   try {
-    const { name, description, price, stock, category, subcategory, image } = req.body;
+    const { title, price, brand, category, subcategory } = req.body;
 
     // Basic validation
-    if (!name || !price || !category || !subcategory)
-      return res.status(400).json({ message: "Name, price, category & subcategory are required" });
+    if (!title || !price || !brand || !category || !subcategory)
+      return res.status(400).json({ message: "Title, price, brand, category & subcategory are required" });
 
     const product = await Product.create({
-      name, description, price, stock, category, subcategory, image
+      ...req.body
     });
 
     res.status(201).json(product);
