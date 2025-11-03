@@ -3,11 +3,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const sendVerificationCode = async (toEmail) => {
+export const sendVerificationCode = async (toEmail, passcode) => {
   try {
-    // Generate a random 6-digit passcode
-    const passcode = Math.floor(100000 + Math.random() * 900000);
-
     // Create a transporter
     const transporter = nodemailer.createTransport({
       service: "gmail", // or use 'smtp.ethereal.email' for testing
@@ -19,7 +16,7 @@ export const sendVerificationCode = async (toEmail) => {
 
     // Mail options
     const mailOptions = {
-      from: `"BDC" <${process.env.EMAIL_USER}>`,
+      from: `BDC<${process.env.EMAIL_USER}>`,
       to: toEmail,
       subject: "Your Login Verification Code",
       html: `
@@ -28,7 +25,7 @@ export const sendVerificationCode = async (toEmail) => {
           <p>Hello 👋,</p>
           <p>Your 6-digit verification code is:</p>
           <h1 style="color:#2563eb;">${passcode}</h1>
-          <p>This code will expire in 10 minutes.</p>
+          <p>This code will expire in ${process.env.OTP_TTL_MINUTES} minutes.</p>
           <hr />
           <small>If you didn’t request this, please ignore this email.</small>
         </div>

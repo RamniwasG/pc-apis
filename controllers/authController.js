@@ -1,9 +1,11 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import twilio from "twilio";
-import User from "../models/User.js";
+import User from "../models/NewUser.js";
 import Otp from "../models/Otp.js";
 import dotenv from "dotenv";
+import { generateAlphaNumericPassCode } from "../utils/index.js";
+import { sendVerificationCode } from "../notifications/sendEmail.js";
 dotenv.config(); 
 
 const {
@@ -27,12 +29,6 @@ if (TWILIO_SID && TWILIO_AUTH_TOKEN) {
   }
 }
 
-function generateNumericOtp(length = 6) {
-  let otp = "";
-  for (let i = 0; i < length; i++) otp += Math.floor(Math.random() * 10);
-  return otp;
-}
-
 function signToken(user) {
   return jwt.sign({ id: user._id.toString(), role: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
@@ -41,15 +37,22 @@ function signToken(user) {
 export  const sendOtp = async (req, res) => {
   try {
     const { phone } = req.body;
-    if (!phone) return res.status(400).json({ message: "Phone is required" });
 
-    // Optional: simple rate limiting per phone using existing OTP attempts
+    let isEmail = false;
+    if(phone.includes('@')) {
+      isEmail = true;
+    }
+    
+    if (!phone) return res.status(400).json({ message: `${isEmail ? 'Email' : 'Phone'} is required` });
+
+    // Optional: simple rate limiting per email using existing OTP attempts
     const latest = await Otp.findOne({ phone }).sort({ createdAt: -1 });
     if (latest && latest.attempts >= Number(OTP_MAX_ATTEMPTS || 5)) {
       return res.status(429).json({ message: "Too many attempts. Try again later." });
     }
+    console.log("isEmail", isEmail)
+    const otp = isEmail ? generateAlphaNumericPassCode(6) : generateNumericOtp(6);
 
-    const otp = generateNumericOtp(6);
     const saltRounds = Number(BCRYPT_SALT_ROUNDS || 10);
     const otpHash = await bcrypt.hash(otp, saltRounds);
     const ttlMinutes = Number(OTP_TTL_MINUTES || 5);
@@ -59,8 +62,10 @@ export  const sendOtp = async (req, res) => {
     await Otp.deleteMany({ phone });
     await Otp.create({ phone, otpHash, expiresAt });
 
-    // Send via Twilio (or fallback to console in non-production)
-    if (twilioClient && TWILIO_PHONE) {
+    if(isEmail) {
+      const passcode = sendVerificationCode(phone, otp);
+      console.log(`[Email Passcode] email=${phone} passcode=${passcode}`);
+    } else if (twilioClient && TWILIO_PHONE) {
       await twilioClient.messages.create({
         body: `Your PC login OTP is ${otp}. It expires in ${ttlMinutes} minutes.`,
         from: TWILIO_PHONE,
@@ -73,9 +78,9 @@ export  const sendOtp = async (req, res) => {
         console.warn("Twilio not configured in production — OTP not sent.");
       }
     }
+    let successMsg = isEmail ? `Passcode sent to ${phone} (if valid)` : `OTP sent to ${phone} (if valid)`;
 
-    // return res.json({ message: "OTP sent (if phone is valid)", ttlMinutes });
-    res.json({ success: true, message: "OTP sent successfully" });
+    res.json({ success: true, message:  successMsg , ttlMinutes });
   } catch (err) {
     console.error("sendOtp error:", err);
     return res.status(500).json({ message: "Internal server error" });
@@ -87,22 +92,28 @@ export  const sendOtp = async (req, res) => {
 // NOTE: Do not accept role from client here in production.
 export const verifyOtp = async (req, res) => {
   try {
-    const { phone, otp } = req.body;
-    if (!phone || !otp) return res.status(400).json({ message: "Phone and OTP required" });
+    const { phone, mobile, otp, role = "customer" } = req.body;
+
+    let isEmail = false;
+    if(phone.includes('@')) {
+      isEmail = true;
+    }
+
+    if (!phone || !otp) return res.status(400).json({ message: `${isEmail ? 'Email' : 'Phone'} and ${isEmail ?' Passcode' : 'OTP'} required` });
 
     const record = await Otp.findOne({ phone });
-    if (!record) return res.status(400).json({ message: "OTP not found or expired" });
+    if (!record) return res.status(400).json({ message: `${isEmail ?' Passcode' : 'OTP'} not found or expired` });
 
     // Check expiry
     if (record.expiresAt < new Date()) {
       await Otp.deleteMany({ phone });
-      return res.status(400).json({ message: "OTP expired. Request a new one." });
+      return res.status(400).json({ message: `${isEmail ?' Passcode' : 'OTP'} expired. Request a new one.` });
     }
 
     // Check attempts limit
     if (record.attempts >= Number(OTP_MAX_ATTEMPTS || 5)) {
       await Otp.deleteMany({ phone });
-      return res.status(429).json({ message: "Too many attempts. Request a new OTP." });
+      return res.status(429).json({ message: `Too many attempts. Request a new ${isEmail ?' Passcode' : 'OTP'}.` });
     }
 
     // Compare OTP using bcrypt
@@ -110,23 +121,31 @@ export const verifyOtp = async (req, res) => {
     if (!match) {
       record.attempts = (record.attempts || 0) + 1;
       await record.save();
-      return res.status(400).json({ message: "Incorrect OTP" });
+      return res.status(400).json({ message: `Incorrect ${isEmail ?' Passcode' : 'OTP'}` });
     }
 
     // OTP valid => remove OTPs
     await Otp.deleteMany({ phone });
 
+    let query = {};
+    if(isEmail) {
+      query.email = phone;
+      query.phone = mobile || "";
+    } else {
+      query.phone = phone;
+    }
     // Find or create user (default role: user)
-    let user = await User.findOne({ phone });
+    let user = await User.findOne(query);
     if (!user) {
-      user = await User.create({ phone });
+      query.role = role;
+      user = await User.create(query);
     }
 
     const token = signToken(user);
     return res.json({
       message: "Login successful!",
       token,
-      user: { id: user._id, phone: user.phone, name: user.name, role: user.role }
+      user: { id: user._id, phone: user.phone, email: user.email, name: user.name, role: user.role }
     });
   } catch (err) {
     console.error("verifyOtp error:", err);
