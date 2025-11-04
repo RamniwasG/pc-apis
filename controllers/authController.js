@@ -50,7 +50,7 @@ export  const sendOtp = async (req, res) => {
     if (latest && latest.attempts >= Number(OTP_MAX_ATTEMPTS || 5)) {
       return res.status(429).json({ message: "Too many attempts. Try again later." });
     }
-    console.log("isEmail", isEmail)
+
     const otp = isEmail ? generateAlphaNumericPassCode(6) : generateNumericOtp(6);
 
     const saltRounds = Number(BCRYPT_SALT_ROUNDS || 10);
@@ -63,8 +63,8 @@ export  const sendOtp = async (req, res) => {
     await Otp.create({ phone, otpHash, expiresAt });
 
     if(isEmail) {
-      const passcode = sendVerificationCode(phone, otp);
-      console.log(`[Email Passcode] email=${phone} passcode=${passcode}`);
+      const passcode = await sendVerificationCode(phone, otp);
+      // console.log(`[Email Passcode] email=${phone} passcode=${passcode}`);
     } else if (twilioClient && TWILIO_PHONE) {
       await twilioClient.messages.create({
         body: `Your PC login OTP is ${otp}. It expires in ${ttlMinutes} minutes.`,
