@@ -5,9 +5,15 @@ dotenv.config();
 
 export const sendVerificationCode = async (toEmail, passcode) => {
   try {
+    console.log(`Sending verification code to email: ${toEmail}`);
+    console.log(`Passcode: ${passcode}`);
+    console.log(`Using EMAIL_USER: ${process.env.EMAIL_USER}`);
+    console.log(`Using EMAIL_PASS: ${process.env.EMAIL_PASS}`);
     // Create a transporter
     const transporter = nodemailer.createTransport({
       service: "gmail", // or use 'smtp.ethereal.email' for testing
+      host: "smtp.mailgun.org",
+      port: 2525,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
