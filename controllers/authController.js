@@ -78,7 +78,7 @@ export  const sendOtp = async (req, res) => {
         console.warn("Twilio not configured in production — OTP not sent.");
       }
     }
-    let successMsg = isEmail ? `Passcode sent to ${phone} (if valid)` : `OTP sent to ${phone} (if valid)`;
+    let successMsg = isEmail ? `Passcode has been sent to ${phone} (if valid), Please check!` : `OTP has been sent to ${phone} (if valid)`;
 
     res.json({ success: true, message:  successMsg , ttlMinutes });
   } catch (err) {
