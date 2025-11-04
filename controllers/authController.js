@@ -79,9 +79,20 @@ export  const sendOtp = async (req, res) => {
         console.warn("Twilio not configured in production — OTP not sent.");
       }
     }
-    let successMsg = isEmail ? `Passcode has been sent to ${phone} (if valid), Please check!` : `OTP has been sent to ${phone} (if valid)`;
 
-    res.json({ success: true, message:  successMsg , ttlMinutes });
+    let successMsg = isEmail ? `Passcode has been sent to ${phone} (if valid), Please check!` : `OTP has been sent to ${phone} (if valid)`;
+    
+    let existingUser = null
+    let user = await User.findOne(isEmail ? { email: phone } : { phone } );
+    if(user) {
+      existingUser = { id: user._id, phone: user.phone, role: user.role };
+    }
+
+    let responsePayload = { success: true, message:  successMsg , ttlMinutes }
+    if(isEmail) {
+      responsePayload = { ...responsePayload, user: existingUser };
+    }
+    res.json(responsePayload);
   } catch (err) {
     console.error("sendOtp error:", err);
     return res.status(500).json({ message: "Internal server error" });
@@ -131,12 +142,13 @@ export const verifyOtp = async (req, res) => {
     let query = {};
     if(isEmail) {
       query.email = phone;
-      query.phone = mobile || "";
     } else {
       query.phone = phone;
     }
-    // Find or create user (default role: user)
+    // Find or create user (default role: customer)
     let user = await User.findOne(query);
+    
+    query.phone = mobile || user.phone;
     if (!user) {
       query.role = role;
       user = await User.create(query);
