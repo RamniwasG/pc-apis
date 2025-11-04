@@ -3,12 +3,13 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// It is better to use services like SendGrid, Mailgun, or Amazon SES for production
+// Here, we use nodemailer with Gmail SMTP for simplicity
+// it only works with SMTP not with HTTPS, for HTTPS use services like SendGrid, Mailgun, etc.
+
+// TODO: replace nodemaller with a more robust service in production like SendGrid, Mailgun, Amazon SES, etc.
 export const sendVerificationCode = async (toEmail, passcode) => {
   try {
-    console.log(`Sending verification code to email: ${toEmail}`);
-    console.log(`Passcode: ${passcode}`);
-    console.log(`Using EMAIL_USER: ${process.env.EMAIL_USER}`);
-    console.log(`Using EMAIL_PASS: ${process.env.EMAIL_PASS}`);
     // Create a transporter
     const transporter = nodemailer.createTransport({
       service: "gmail", // or use 'smtp.ethereal.email' for testing
