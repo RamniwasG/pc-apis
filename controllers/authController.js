@@ -4,7 +4,7 @@ import twilio from "twilio";
 import User from "../models/NewUser.js";
 import Otp from "../models/Otp.js";
 import dotenv from "dotenv";
-import { generateAlphaNumericPassCode } from "../utils/index.js";
+import { generateAlphaNumericPassCode, generateNumericOtp } from "../utils/index.js";
 import { sendVerificationCode } from "../notifications/sendEmail.js";
 dotenv.config(); 
 
@@ -52,6 +52,7 @@ export  const sendOtp = async (req, res) => {
     }
 
     const otp = isEmail ? generateAlphaNumericPassCode(6) : generateNumericOtp(6);
+    console.log(`Generated Passcode/OTP for ${phone}: ${otp}`);
 
     const saltRounds = Number(BCRYPT_SALT_ROUNDS || 10);
     const otpHash = await bcrypt.hash(otp, saltRounds);
@@ -64,7 +65,7 @@ export  const sendOtp = async (req, res) => {
 
     if(isEmail) {
       const passcode = await sendVerificationCode(phone, otp);
-      // console.log(`[Email Passcode] email=${phone} passcode=${passcode}`);
+      console.log(`[Email Passcode] email=${phone} passcode=${passcode}`);
     } else if (twilioClient && TWILIO_PHONE) {
       await twilioClient.messages.create({
         body: `Your PC login OTP is ${otp}. It expires in ${ttlMinutes} minutes.`,
