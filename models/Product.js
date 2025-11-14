@@ -43,12 +43,15 @@ const productSchema = new mongoose.Schema(
       required: true,
       min: [0, 'Stock cannot be negative'],
     },
-    images: [
-      {
-        url: { type: String, required: true },
-        public_id: { type: String },
-      },
-    ],
+    image: {
+      type: String
+    },
+    // images: [
+    //   {
+    //     url: { type: String, required: true },
+    //     public_id: { type: String },
+    //   },
+    // ],
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
@@ -56,7 +59,7 @@ const productSchema = new mongoose.Schema(
     },
     subcategory: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'SubCategory',
+      ref: 'Subcategory',
     },
     brand: { type: String },
     color: [{ type: String }], // Example: ["Red", "Blue", "Black"]
@@ -89,7 +92,7 @@ const productSchema = new mongoose.Schema(
     views: { type: Number, default: 0 },
     sold: { type: Number, default: 0 },
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 )
 
 // Auto-generate slug from title
@@ -97,6 +100,9 @@ productSchema.pre('save', function (next) {
   if (this.isModified('title')) {
     this.slug = this.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
   }
+  // if (!this.sku) {
+  //   this.sku = generateSKU(this.title, this.category);
+  // }
   next()
 })
 

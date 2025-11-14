@@ -55,11 +55,7 @@ const userSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Order" // reference to orders collection
     }
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+  ]
+}, { timestamps: true, versionKey: false });
 
 export default mongoose.model("User", userSchema);

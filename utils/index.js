@@ -33,5 +33,18 @@ function generateNumericOtp(length = 6) {
   return otp;
 }
 
+function generateSKU(productName, category) {
+  // Take first 3 letters of category and product name
+  const cat = category ? category.substring(0, 3).toUpperCase() : "GEN";
+  const prod = productName ? productName.substring(0, 3).toUpperCase() : "PRD";
 
-export { generateAlphaNumericPassCode, generatePasscode, generateNumericOtp };
+  // Random 4-digit alphanumeric code
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+
+  // Date-based unique suffix (YYMMDD)
+  const date = new Date().toISOString().slice(2, 10).replace(/-/g, "");
+
+  return `${cat}-${prod}-${random}-${date}`;
+}
+
+export { generateAlphaNumericPassCode, generatePasscode, generateNumericOtp, generateSKU };

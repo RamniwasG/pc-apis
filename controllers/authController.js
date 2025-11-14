@@ -186,7 +186,6 @@ export const updateRole = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   const { id } = req.params;
-  console.log(id)
   const user = await User.findById(id);
   if (!user) return res.status(404).json({ message: 'User not found' });
   res.json(user);
@@ -194,13 +193,19 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   const { id } = req.params;
-  const { name, email, address, avatar } = req.body;
+  const { profile, email, role, address } = req.body;
 
   const user = await User.findOneAndUpdate(
     { id },
-    { name, email, avatar, $push: { addresses: address } },
+    { email, role, profile, $push: { addresses: address } },
     { new: true }
   );
 
   res.json(user);
+};
+
+// Admin Only Example
+export const getAllUsers = async (req, res) => {
+  const users = await User.find().select("-password");
+  res.json(users);
 };

@@ -15,6 +15,6 @@ const subcategorySchema = new mongoose.Schema({
     type: String,
     default: ""
   }
-}, { timestamps: true });
+}, { timestamps: true, versionKey: false });
 
 export default mongoose.model("Subcategory", subcategorySchema);
