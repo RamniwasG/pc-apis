@@ -11,6 +11,6 @@ const categorySchema = new mongoose.Schema({
     type: String,
     default: ""
   }
-}, { timestamps: true });
+}, { timestamps: true, versionKey: false  });
 
 export default mongoose.model("Category", categorySchema);
