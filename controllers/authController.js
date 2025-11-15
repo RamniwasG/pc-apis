@@ -209,3 +209,13 @@ export const getAllUsers = async (req, res) => {
   const users = await User.find().select("-password");
   res.json(users);
 };
+
+export const removeUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await User.findByIdAndDelete(id);
+    res.json({ message: "User deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
