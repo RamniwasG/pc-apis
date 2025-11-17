@@ -43,15 +43,12 @@ const productSchema = new mongoose.Schema(
       required: true,
       min: [0, 'Stock cannot be negative'],
     },
-    image: {
-      type: String
-    },
-    // images: [
-    //   {
-    //     url: { type: String, required: true },
-    //     public_id: { type: String },
-    //   },
-    // ],
+    images: [
+      {
+        url: { type: String, required: true },
+        public_id: { type: String },
+      },
+    ],
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
@@ -78,7 +75,7 @@ const productSchema = new mongoose.Schema(
     },
     reviews: [reviewSchema],
 
-    isFeatured: { type: Boolean, default: false },
+    // isFeatured: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     tags: [{ type: String, trim: true }],
     sku: {
@@ -100,8 +97,17 @@ productSchema.pre('save', function (next) {
   if (this.isModified('title')) {
     this.slug = this.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
   }
-  // if (!this.sku) {
-  //   this.sku = generateSKU(this.title, this.category);
+  // if (!this.sku || this.isModified('title')) {
+  //   const cat = this.category ? this.category.substring(0, 3).toUpperCase() : "GEN";
+  //   const prod = this.title ? this.title.substring(0, 3).toUpperCase() : "PRD";
+
+  //   // Random 4-digit alphanumeric code
+  //   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+
+  //   // Date-based unique suffix (YYMMDD)
+  //   const date = new Date().toISOString().slice(2, 10).replace(/-/g, "");
+
+  //   this.sku = `${cat}-${prod}-${random}-${date}`;
   // }
   next()
 })
