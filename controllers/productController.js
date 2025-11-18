@@ -23,7 +23,7 @@ export const getProducts = async (req, res) => {
     const products = await Product.find()
       .populate("category", "name")
       .populate("subcategory", "name");
-    res.json(products);
+    res.json({ success: true, products });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -36,7 +36,7 @@ export const getProductById = async (req, res) => {
       .populate("subcategory", "name");
 
     if (!product) return res.status(404).json({ message: "Product not found" });
-    res.json(product);
+    res.json({ success: true, product });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -48,7 +48,7 @@ export const getProductsByCategory = async (req, res) => {
     const products = await Product.find({ category: categoryId })
       .populate("category", "name")
       .populate("subcategory", "name");
-    res.json(products);
+    res.json({ success: true, products });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -60,7 +60,7 @@ export const getProductsBySubcategory = async (req, res) => {
     const products = await Product.find({ subcategory: subcategoryId })
       .populate("category", "name")
       .populate("subcategory", "name");
-    res.json(products);
+    res.json({ success: true, products });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

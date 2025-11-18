@@ -15,7 +15,7 @@ export const createSubcategory = async (req, res) => {
 export const getSubcategories = async (req, res) => {
   try {
     const subcategories = await Subcategory.find().populate("category", "name");
-    res.json(subcategories);
+    res.json({ success: true, subcategories });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -25,7 +25,7 @@ export const getSubcategoriesByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
     const subcategories = await Subcategory.find({ category: categoryId });
-    res.json(subcategories);
+    res.json({ success: true, subcategories });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

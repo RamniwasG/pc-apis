@@ -207,7 +207,7 @@ export const updateProfile = async (req, res) => {
 // Admin Only Example
 export const getAllUsers = async (req, res) => {
   const users = await User.find().select("-password");
-  res.json(users);
+  res.json({ success: true, users });
 };
 
 export const removeUser = async (req, res) => {
