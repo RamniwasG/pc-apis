@@ -5,7 +5,7 @@ import { authorizeRoles, protect } from "../middlewares/auth.js";
 const router = express.Router();
 
 router.post("/add", protect, authorizeRoles('admin'), createSubcategory);
-router.get("/fetchAllSubCategories", protect, authorizeRoles('admin', 'seller', 'staff'), getSubcategories);
+router.get("/fetchAllSubcategories", protect, authorizeRoles('admin', 'seller', 'staff'), getSubcategories);
 router.get("/category/:categoryId", protect, authorizeRoles('admin', 'seller', 'staff'), getSubcategoriesByCategory);
 router.put("/:id", protect, authorizeRoles('admin'), updateSubcategoryById);
 router.delete("/:id", protect, authorizeRoles('admin'), deleteSubcategory);
