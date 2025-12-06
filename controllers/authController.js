@@ -143,12 +143,12 @@ export const verifyOtp = async (req, res) => {
     if(isEmail) {
       query.email = phone;
     } else {
-      query.phone = phone;
+      query.phone = phone.includes('+') ? phone : `+91${phone}`;
     }
     // Find or create user (default role: customer)
     let user = await User.findOne(query);
     
-    query.phone = mobile || user.phone;
+    query.phone = mobile || user?.phone;
     if (!user) {
       query.role = role;
       user = await User.create(query);
