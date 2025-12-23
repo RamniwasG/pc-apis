@@ -80,7 +80,7 @@ export  const sendOtp = async (req, res) => {
       }
     }
 
-    let successMsg = isEmail ? `Passcode has been sent to ${phone} (if valid), Please check!` : `OTP has been sent to ${phone} (if valid)`;
+    let successMsg = isEmail ? `Passcode has been sent to ${phone}.` : `OTP has been sent to ${phone}.`;
     
     let existingUser = null
     let user = await User.findOne(isEmail ? { email: phone } : { phone } );
