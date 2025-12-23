@@ -1,7 +1,74 @@
 import express from "express";
-import Order from "../models/Order.js";
+// import Order from "../models/Order1.js";
+import crypto from "crypto";
+import razorpay from '../config/razorpay.js';
+import Order from '../models/Order.js';
+import NewOrder from '../models/NewOrder.js';
 
 const router = express.Router();
+
+export const createTestOrder = async (req, res) => {
+  try {
+    const { userId, items, amount } = req.body
+
+    const razorpayOrder = await razorpay.orders.create({
+      amount: amount * 100,
+      currency: 'INR',
+      receipt: `receipt_${Date.now()}`
+    })
+
+    const order = await NewOrder.create({
+      userId,
+      items,
+      amount,
+      razorpayOrderId: razorpayOrder.id
+    })
+
+    res.json({
+      orderId: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency
+    })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+};
+
+export const verifyTestOrder = async (req, res) => {
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature
+    } = req.body
+
+    const sign = razorpay_order_id + '|' + razorpay_payment_id
+
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(sign)
+      .digest('hex')
+
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({ message: 'Invalid signature' })
+    }
+
+    const order = await NewOrder.findOne({ razorpayOrderId: razorpay_order_id })
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' })
+    }
+
+    order.razorpayPaymentId = razorpay_payment_id
+    order.razorpaySignature = razorpay_signature
+    order.status = 'PAID'
+    await order.save()
+
+    res.json({ success: true, order })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+};
 
 export const createOrder = async (req, res) => {
   try {

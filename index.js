@@ -10,7 +10,11 @@ import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import paymentRoutes from "./routes/orderPayment.js";
+
+// Database connection && CORS options
 import { connectDB } from "./config/db.js";
+// import { corsOptions } from "./config/corsOptions.js";
 
 dotenv.config();
 connectDB();
@@ -33,8 +37,17 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/subcategories", subcategoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/uploads", uploadRoutes);
+
+// Global error handler
+// app.use((err, req, res, next) => {
+//   if (err.message.includes("CORS")) {
+//     return res.status(403).json({ error: err.message });
+//   }
+//   next(err);
+// });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
