@@ -3,6 +3,7 @@ import ejs from "ejs";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
+import orderEmailTemplate from "../emails/email-template";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,27 +21,34 @@ export const sendOrderConfirmationEmail = async (order) => {
     },
   });
 
-  const templatePath = path.join(
-    __dirname,
-    "../emails/order-confirmation.ejs"
-  );
-  console.log("Template Path:", templatePath);
+  // const templatePath = path.join(
+  //   __dirname,
+  //   "../emails/order-confirmation.ejs"
+  // );
+  // console.log("Template Path:", templatePath);
 
   try {
-    const html = await ejs.renderFile(templatePath, {
+    // const html = await ejs.renderFile(templatePath, {
+    //   customerName: order.customerName,
+    //   orderId: order.orderId,
+    //   items: order.items,
+    //   totalAmount: order.totalAmount,
+    //   shippingAddress: order.shippingAddress,
+    //   year: new Date().getFullYear(),
+    // });
+    const templateData = {
       customerName: order.customerName,
       orderId: order.orderId,
       items: order.items,
       totalAmount: order.totalAmount,
       shippingAddress: order.shippingAddress,
       year: new Date().getFullYear(),
-    });
-
+    };
     await transporter.sendMail({
       from: `${process.env.STORE} <${process.env.EMAIL_USER}>`,
       to: order.email,
       subject: "Your Order Confirmation",
-      html,
+      html: orderEmailTemplate(templateData)
     });
   } catch (error) {
     console.error("Error rendering email template:", error);
