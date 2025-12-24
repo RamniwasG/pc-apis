@@ -12,9 +12,9 @@ export const sendVerificationCode = async (toEmail, passcode) => {
   try {
     // Create a transporter
     const transporter = nodemailer.createTransport({
-      service: "gmail", // or use 'smtp.ethereal.email' for testing
-      host: "smtp.mailgun.org",
-      port: 2525,
+      service: process.env.EMAIL_SERVICE, // or use 'smtp.ethereal.email' for testing
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,

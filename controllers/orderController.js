@@ -4,6 +4,7 @@ import crypto from "crypto";
 import razorpay from '../config/razorpay.js';
 import Order from '../models/Order.js';
 import NewOrder from '../models/NewOrder.js';
+import { sendOrderConfirmationEmail } from "../utils/orderConfirmationEmail.js";
 
 const router = express.Router();
 
@@ -63,6 +64,19 @@ export const verifyTestOrder = async (req, res) => {
     order.razorpaySignature = razorpay_signature
     order.status = 'PAID'
     await order.save()
+
+    // send order confirmation email
+    await sendOrderConfirmationEmail({
+      email: "ramniwasg96@gmail.com",
+      customerName: "Ram Niwas",
+      orderId: razorpay_order_id,
+      items: [
+        { title: "Wireless Headphones", quantity: 1, price: 2999 },
+        { title: "Gaming Mouse", quantity: 2, price: 1499 },
+      ],
+      totalAmount: 5997,
+      shippingAddress: "221B Baker Street, New Delhi, India",
+    });
 
     res.json({ success: true, order })
   } catch (err) {
