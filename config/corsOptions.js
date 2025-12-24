@@ -4,7 +4,7 @@ const allowedOrigins = [
   "https://pc-app.onrender.com/",
 //   "capacitor://localhost",
   // remove in production
-  // "http://localhost:3000",
+  "http://localhost:3000",
   // "http://localhost:3001", 
 ];
 
