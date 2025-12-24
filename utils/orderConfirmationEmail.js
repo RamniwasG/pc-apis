@@ -32,7 +32,7 @@ export const sendOrderConfirmationEmail = async (order) => {
   });
 
   await transporter.sendMail({
-    from: `${process.env.STORE} <${process.env.SMTP_USER}>`,
+    from: `${process.env.STORE} <${process.env.EMAIL_USER}>`,
     to: order.email,
     subject: "Your Order Confirmation",
     html,
