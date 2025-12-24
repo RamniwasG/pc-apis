@@ -2,6 +2,10 @@ import nodemailer from "nodemailer";
 import ejs from "ejs";
 import path from "path";
 import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -17,11 +21,10 @@ export const sendOrderConfirmationEmail = async (order) => {
   });
 
   const templatePath = path.join(
-    process.cwd(),
-    "emails",
-    "order-confirmation.ejs"
+    __dirname,
+    "../emails/order-confirmation.ejs"
   );
-
+  console.log("Template Path:", templatePath);
   const html = await ejs.renderFile(templatePath, {
     customerName: order.customerName,
     orderId: order.orderId,
