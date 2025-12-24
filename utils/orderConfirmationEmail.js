@@ -25,19 +25,25 @@ export const sendOrderConfirmationEmail = async (order) => {
     "../emails/order-confirmation.ejs"
   );
   console.log("Template Path:", templatePath);
-  const html = await ejs.renderFile(templatePath, {
-    customerName: order.customerName,
-    orderId: order.orderId,
-    items: order.items,
-    totalAmount: order.totalAmount,
-    shippingAddress: order.shippingAddress,
-    year: new Date().getFullYear(),
-  });
 
-  await transporter.sendMail({
-    from: `${process.env.STORE} <${process.env.EMAIL_USER}>`,
-    to: order.email,
-    subject: "Your Order Confirmation",
-    html,
-  });
+  try {
+    const html = await ejs.renderFile(templatePath, {
+      customerName: order.customerName,
+      orderId: order.orderId,
+      items: order.items,
+      totalAmount: order.totalAmount,
+      shippingAddress: order.shippingAddress,
+      year: new Date().getFullYear(),
+    });
+
+    await transporter.sendMail({
+      from: `${process.env.STORE} <${process.env.EMAIL_USER}>`,
+      to: order.email,
+      subject: "Your Order Confirmation",
+      html,
+    });
+  } catch (error) {
+    console.error("Error rendering email template:", error);
+    throw new Error(error);
+  }
 };
