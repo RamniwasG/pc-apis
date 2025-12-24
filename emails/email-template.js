@@ -74,13 +74,13 @@ const orderEmailTemplate = (order) => {
                     </tr>
                     </thead>
                     <tbody>
-                    ${items.map(item => `
-                        <tr>
-                        <td>${item.title}</td>
-                        <td>${item.quantity}</td>
-                        <td>₹${item.price}</td>
-                        </tr>
-                    `)}
+                        ${items.map(item => `
+                            <tr>
+                                <td>${item.title}</td>
+                                <td>${item.quantity}</td>
+                                <td>₹${item.price}</td>
+                            </tr>
+                        `).join("")}
                     </tbody>
                 </table>
 
