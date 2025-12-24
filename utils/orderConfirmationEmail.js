@@ -4,7 +4,6 @@ import path from "path";
 import dotenv from "dotenv";
 
 dotenv.config();
-console.log(process.env);
 
 export const sendOrderConfirmationEmail = async (order) => {
   const transporter = nodemailer.createTransport({
