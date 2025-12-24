@@ -4,7 +4,7 @@ const allowedOrigins = [
   "https://pc-app.onrender.com/",
 //   "capacitor://localhost",
   // remove in production
-  "http://localhost:3000",
+  // "http://localhost:3000",
   // "http://localhost:3001", 
 ];
 
@@ -23,6 +23,7 @@ export const corsOptions = {
   allowedHeaders: [
     "Content-Type",
     "Authorization",
+    "Access-Control-Allow-Headers",
     "X-Requested-With",
     "Accept",
     "x-rtb-fingerprint-id"

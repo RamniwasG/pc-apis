@@ -14,14 +14,14 @@ import paymentRoutes from "./routes/orderPayment.js";
 
 // Database connection && CORS options
 import { connectDB } from "./config/db.js";
-import { corsOptions } from "./config/corsOptions.js";
+// import { corsOptions } from "./config/corsOptions.js";
 
 dotenv.config();
 connectDB();
 
 const app = express();
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
