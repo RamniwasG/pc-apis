@@ -3,7 +3,7 @@ import ejs from "ejs";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
-import orderEmailTemplate from "../emails/email-template";
+import orderEmailTemplate from "../emails/email-template.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
