@@ -1,5 +1,5 @@
 const orderEmailTemplate = (order) => {
-    const { customerName, items, totalAmount, shippingAddress, year } = order;
+    const { orderId, customerName, items, totalAmount, shippingAddress, year } = order;
   return `
     <!DOCTYPE html>
     <html>
