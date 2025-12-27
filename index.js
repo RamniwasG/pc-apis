@@ -2,18 +2,18 @@ import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from 'cors';
-import authRoutes from "./routes/authRoutes.js";
-import adminAuthRoutes from './routes/adminAuth.js';
-import categoryRoutes from "./routes/categoryRoutes.js";
-import subcategoryRoutes from "./routes/subcategoryRoutes.js";
-import productRoutes from "./routes/productRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
-import dashboardRoutes from "./routes/dashboardRoutes.js";
-import uploadRoutes from "./routes/uploadRoutes.js";
-import paymentRoutes from "./routes/orderPayment.js";
+import authRoutes from "./src/routes/authRoutes.js";
+import adminAuthRoutes from './src/routes/adminAuth.js';
+import categoryRoutes from "./src/routes/categoryRoutes.js";
+import subcategoryRoutes from "./src/routes/subcategoryRoutes.js";
+import productRoutes from "./src/routes/productRoutes.js";
+import orderRoutes from "./src/routes/orderRoutes.js";
+import dashboardRoutes from "./src/routes/dashboardRoutes.js";
+import uploadRoutes from "./src/routes/uploadRoutes.js";
+import paymentRoutes from "./src/routes/orderPayment.js";
 
 // Database connection && CORS options
-import { connectDB } from "./config/db.js";
+import { connectDB } from "./src/config/db.js";
 // import { corsOptions } from "./config/corsOptions.js";
 
 dotenv.config();
