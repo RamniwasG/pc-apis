@@ -22,6 +22,10 @@ export const sendOrderConfirmationEmail = async (req, res) => {
     "order-confirmation.ejs"
   );
   
+  if(templatePath.includes('src')) {
+    templatePath = templatePath.replace('/src', '')
+  }
+  
   console.log("Template Path:", templatePath);
 
   try {
