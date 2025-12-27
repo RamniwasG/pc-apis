@@ -16,13 +16,16 @@ export const sendOrderConfirmationEmail = async (req, res) => {
     },
   });
 
-  const templatePath = path.join(
+  let templatePath = path.join(
     process.cwd(), // ⭐ CRITICAL
     "views",
     "emails",
     "order-confirmation.ejs"
   );
   
+  if(templatePath.includes('src')) {
+    templatePath = templatePath.replace('src/', '')
+  }
   console.log("Template Path:", templatePath);
 
   try {
@@ -35,8 +38,6 @@ export const sendOrderConfirmationEmail = async (req, res) => {
       shippingAddress: order.shippingAddress,
       year: new Date().getFullYear(),
     });
-
-    console.log("htmlTemplate:", htmlTemplate);
     
     await transporter.sendMail({
       from: `${process.env.STORE} <${process.env.EMAIL_USER}>`,
