@@ -16,16 +16,23 @@ export const sendOrderConfirmationEmail = async (req, res) => {
     },
   });
 
-  let templatePath = path.join(
-    process.cwd(), // ⭐ CRITICAL
-    "views",
-    "emails",
-    "order-confirmation.ejs"
-  );
-  
-  if(templatePath.includes('src')) {
-    templatePath = templatePath.replace('src/', '')
+  let cwd = process.cwd();
+  let templatePath;
+  if(cwd.includes('src')) {
+    templatePath = path.join(
+        cwd, // ⭐ CRITICAL
+        "views",
+        "order-confirmation.ejs"
+    );
+  } else {
+    cwd += '/src/'
+    templatePath = path.join(
+        cwd, // ⭐ CRITICAL
+        "views",
+        "order-confirmation.ejs"
+    );
   }
+  
   console.log("Template Path:", templatePath);
 
   try {
