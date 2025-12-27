@@ -4,8 +4,8 @@ import {
   loginUser,
   getProfile,
   getAllUsers,
-} from "../controllers/adminAuthController.js";
-import { protect, authorizeRoles } from "../middlewares/auth.js";
+} from "./../controllers/adminAuthController.js";
+import { protect, authorizeRoles } from "./../middlewares/auth.js";
 
 const router = express.Router();
 

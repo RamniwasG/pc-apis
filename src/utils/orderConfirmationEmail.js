@@ -16,21 +16,14 @@ export const sendOrderConfirmationEmail = async (req, res) => {
     },
   });
 
-  let cwd = process.cwd();
-  let templatePath;
-  if(cwd.includes('src')) {
-    templatePath = path.join(
-        cwd, // ⭐ CRITICAL
-        "views",
-        "order-confirmation.ejs"
-    );
-  } else {
-    cwd += '/src/'
-    templatePath = path.join(
-        cwd, // ⭐ CRITICAL
-        "views",
-        "order-confirmation.ejs"
-    );
+  let templatePath = path.join(
+    process.cwd(), // ⭐ CRITICAL
+    "views",
+    "order-confirmation.ejs"
+  );
+  
+  if(templatePath.includes('src')) {
+    templatePath = templatePath.replace('/src', '')
   }
   
   console.log("Template Path:", templatePath);
