@@ -50,9 +50,7 @@ export const sendOrderConfirmationEmail = async (req, res) => {
       from: `${process.env.STORE} <${process.env.EMAIL_USER}>`,
       to: req.user.email,
       subject: "Order Successful",
-      html: `
-        <!DOCTYPE html>
-        <html>
+      html: `<html>
             <head>
             <meta charset="UTF-8" />
             <title>Order Confirmation</title>
