@@ -66,17 +66,17 @@ export const verifyTestOrder = async (req, res) => {
     await order.save()
 
     // send order confirmation email
-    await sendOrderConfirmationEmail({
-      email: req.user.email || "ramniwasg96@gmail.com",
-      customerName: req.user.name || "Ram Niwas",
-      orderId: razorpay_order_id,
-      items: order.items.length > 0 ? order.items.length : [
-        { title: "Wireless Headphones", quantity: 1, price: 2999 },
-        { title: "Gaming Mouse", quantity: 2, price: 1499 },
-      ],
-      totalAmount: order.amount || 4999,
-      shippingAddress: order.shippingAddress || "#234, Peer Nagar, Ghazipur, Uttar Pradesh, India - 233001",
-    });
+    // await sendOrderConfirmationEmail({
+    //   email: req.user.email || "ramniwasg96@gmail.com",
+    //   customerName: req.user.name || "Ram Niwas",
+    //   orderId: razorpay_order_id,
+    //   items: order.items.length > 0 ? order.items.length : [
+    //     { title: "Wireless Headphones", quantity: 1, price: 2999 },
+    //     { title: "Gaming Mouse", quantity: 2, price: 1499 },
+    //   ],
+    //   totalAmount: order.amount || 4999,
+    //   shippingAddress: order.shippingAddress || "#234, Peer Nagar, Ghazipur, Uttar Pradesh, India - 233001",
+    // });
 
     res.json({ success: true, order })
   } catch (err) {
