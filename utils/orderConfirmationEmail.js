@@ -47,14 +47,13 @@ export const sendOrderConfirmationEmail = async (req, res) => {
     };
     const { customerName, orderId, items, totalAmount, shippingAddress, year } = templateData;
     const htmlTemplate = `
-        <!DOCTYPE html>
         <html>
             <head>
             <meta charset="UTF-8" />
             </head>
             <body style="font-family:Arial;">
-            <h2 style="color:#333;">Order Confirmed</h2>
-            <p>Your order <b>#${orderId}</b> has been placed successfully.</p>
+                <h2 style="color:#333;">Order Confirmed</h2>
+                <p>Your order <b>#${orderId}</b> has been placed successfully.</p>
             </body>
         </html>
     `;
