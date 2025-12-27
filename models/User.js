@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const addressSchema = new mongoose.Schema({
+export const addressSchema = new mongoose.Schema({
   label: { type: String, default: "Home" }, // Home / Office / Other
   fullName: { type: String, required: true },
   mobile: { type: String, required: true },

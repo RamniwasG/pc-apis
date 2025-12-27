@@ -1,29 +1,33 @@
 import express from "express";
-// import Order from "../models/Order1.js";
 import crypto from "crypto";
 import razorpay from '../config/razorpay.js';
 import Order from '../models/Order.js';
-import NewOrder from '../models/NewOrder.js';
-import { sendOrderConfirmationEmail } from "../utils/orderConfirmationEmail.js";
 
 const router = express.Router();
 
 export const createTestOrder = async (req, res) => {
   try {
-    const { userId, items, amount } = req.body
+    const { items, shippingAddress, paymentMethod } = req.body;
+    
+    const totalAmount = items.reduce(
+      (sum, item) => sum + item.qty * item.price,
+      0
+    );
 
     const razorpayOrder = await razorpay.orders.create({
-      amount: amount * 100,
+      amount: totalAmount * 100,
       currency: 'INR',
       receipt: `receipt_${Date.now()}`
     })
 
-    const order = await NewOrder.create({
-      userId,
+    await Order.create({
+      user: req.user.id,
       items,
-      amount,
+      shippingAddress,
+      paymentMethod,
+      totalAmount: razorpayOrder.amount,
       razorpayOrderId: razorpayOrder.id
-    })
+    });
 
     res.json({
       orderId: razorpayOrder.id,
@@ -54,7 +58,7 @@ export const verifyTestOrder = async (req, res) => {
       return res.status(400).json({ message: 'Invalid signature' })
     }
 
-    const order = await NewOrder.findOne({ razorpayOrderId: razorpay_order_id })
+    const order = await Order.findOne({ razorpayOrderId: razorpay_order_id })
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' })
@@ -62,21 +66,8 @@ export const verifyTestOrder = async (req, res) => {
 
     order.razorpayPaymentId = razorpay_payment_id
     order.razorpaySignature = razorpay_signature
-    order.status = 'PAID'
+    order.paymentStatus = 'paid'
     await order.save()
-
-    // send order confirmation email
-    // await sendOrderConfirmationEmail({
-    //   email: req.user.email || "ramniwasg96@gmail.com",
-    //   customerName: req.user.name || "Ram Niwas",
-    //   orderId: razorpay_order_id,
-    //   items: order.items.length > 0 ? order.items.length : [
-    //     { title: "Wireless Headphones", quantity: 1, price: 2999 },
-    //     { title: "Gaming Mouse", quantity: 2, price: 1499 },
-    //   ],
-    //   totalAmount: order.amount || 4999,
-    //   shippingAddress: order.shippingAddress || "#234, Peer Nagar, Ghazipur, Uttar Pradesh, India - 233001",
-    // });
 
     res.json({ success: true, order })
   } catch (err) {
@@ -86,7 +77,7 @@ export const verifyTestOrder = async (req, res) => {
 
 export const createOrder = async (req, res) => {
   try {
-    const { items, shippingAddress, paymentMethod } = req.body;
+    const { orderId, items, shippingAddress, paymentMethod, paymentStatus, orderStatus } = req.body;
 
     if (!items || items.length === 0)
       return res.status(400).json({ message: "No items found" });
@@ -101,8 +92,19 @@ export const createOrder = async (req, res) => {
       items,
       shippingAddress,
       paymentMethod,
+      paymentStatus,
       totalAmount,
     });
+
+    // send order confirmation email
+    // await sendOrderConfirmationEmail({
+    //   email: req.user.email,
+    //   customerName: req.user.name,
+    //   orderId,
+    //   items,
+    //   totalAmount,
+    //   shippingAddress,
+    // });
 
     res.status(201).json({ success: true, order });
   } catch (error) {

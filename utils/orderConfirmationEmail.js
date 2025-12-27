@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
-export const sendOrderConfirmationEmail = async (order) => {
+export const sendOrderConfirmationEmail = async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE,
     host: process.env.EMAIL_HOST,
@@ -36,19 +36,20 @@ export const sendOrderConfirmationEmail = async (order) => {
     //   shippingAddress: order.shippingAddress,
     //   year: new Date().getFullYear(),
     // });
+    const order = req.body;
     const templateData = {
-      customerName: order.customerName,
-      orderId: order.orderId,
+      customerName: req.user.username,
+      orderId: order._id,
       items: order.items,
-      totalAmount: order.totalAmount,
+      totalAmount: order.totalAmount / 100,
       shippingAddress: order.shippingAddress,
       year: new Date().getFullYear(),
     };
     const { customerName, orderId, items, totalAmount, shippingAddress, year } = templateData;
     await transporter.sendMail({
       from: `${process.env.STORE} <${process.env.EMAIL_USER}>`,
-      to: order.email,
-      subject: "Your Order Confirmation",
+      to: req.user.email,
+      subject: "Order Successful",
       html: `
         <!DOCTYPE html>
         <html>
@@ -126,7 +127,7 @@ export const sendOrderConfirmationEmail = async (order) => {
                             ${items.map(item => `
                                 <tr>
                                     <td>${item.title}</td>
-                                    <td>${item.quantity}</td>
+                                    <td>${item.qty}</td>
                                     <td>₹${item.price}</td>
                                 </tr>
                             `).join("")}
@@ -155,6 +156,8 @@ export const sendOrderConfirmationEmail = async (order) => {
         </html>
       `
     });
+
+    res.status(200).send({ success: true })
   } catch (error) {
     console.error("Error rendering email template:", error);
     throw new Error(error);

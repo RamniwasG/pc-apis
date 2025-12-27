@@ -1,5 +1,6 @@
 // models/Order.js
 import mongoose from "mongoose";
+import { addressSchema } from "./User.js";
 
 const historySchema = new mongoose.Schema({
   status: {
@@ -26,8 +27,15 @@ const orderSchema = new mongoose.Schema({
       price: { type: Number, required: true }
     }
   ],
+  currency: {
+    type: String,
+    default: 'INR'
+  },
+  razorpayOrderId: String,
+  razorpayPaymentId: String,
+  razorpaySignature: String,
 
-  shippingAddress: { /* ... */ },
+  shippingAddress: addressSchema,
 
   paymentMethod: { type: String, enum: ["card","cod","upi"], default: "cod" },
   paymentStatus: { type: String, enum: ["pending","paid","failed"], default: "pending" },
